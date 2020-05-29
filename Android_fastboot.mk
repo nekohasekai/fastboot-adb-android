@@ -6,6 +6,8 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := fastboot
 
+LOCAL_CFLAGS += -Wno-unused-parameter
+
 LOCAL_CFLAGS := \
     -std=c++14 \
     -DANDROID_HOST_BUILD -DADB_HOST \
