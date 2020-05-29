@@ -6,7 +6,9 @@ BUILD_DIR=$ROOT_DIR/build
 
 ABIS="armeabi-v7a arm64-v8a x86 x86_64"
 
-export NDK="$ANDROID_NDK"
+NDK="$ANDROID_HOME/ndk"
+NDK=$NDK/$(ls $NDK)
+export ANDROID_NDK=$NDK
 
 function build_one {
 
