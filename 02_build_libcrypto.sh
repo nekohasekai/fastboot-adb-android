@@ -9,47 +9,20 @@ ABIS="armeabi-v7a arm64-v8a x86 x86_64"
 export NDK="$ANDROID_NDK"
 
 function build_one {
-	mkdir -p $BUILD_DIR/$CPU
-	cd $BUILD_DIR/$CPU
 
-	echo "Configuring..."
-	cmake -DANDROID_NATIVE_API_LEVEL=${API} -DANDROID_ABI=${CPU} -DCMAKE_BUILD_TYPE=Release -DANDROID_NDK=${NDK} -DCMAKE_TOOLCHAIN_FILE=$NDK/build/cmake/android.toolchain.cmake -DANDROID_NATIVE_API_LEVEL=16 -GNinja -DCMAKE_MAKE_PROGRAM=${NINJA_PATH} $ROOT_DIR	
-	echo "Building..."
-	cmake --build .
+  mkdir -p $BUILD_DIR/$CPU
+  cd $BUILD_DIR/$CPU
+  echo "Configuring..."
+  cmake -DANDROID_NATIVE_API_LEVEL=${API} -DANDROID_ABI=${CPU} -DCMAKE_BUILD_TYPE=Release -DANDROID_NDK=${NDK} -DCMAKE_TOOLCHAIN_FILE=$NDK/build/cmake/android.toolchain.cmake -DANDROID_NATIVE_API_LEVEL=16 -GNinja -DCMAKE_MAKE_PROGRAM=${NINJA_PATH} $ROOT_DIR	
+  echo "Building..."
+  cmake --build .
   
   mkdir -p $DIST_DIR/$CPU
 	
   mv crypto/libcrypto.a $DIST_DIR/$CPU
   mv decrepit/libdecrepit.a $DIST_DIR/$CPU
   
-	cd ..
 }
-
-function checkPreRequisites {
-
-    if ! [ -d "boringssl" ] || ! [ "$(ls -A boringssl)" ]; then
-        echo -e "\033[31mFailed! Submodule 'boringssl' not found!\033[0m"
-        echo -e "\033[31mTry to run: 'git submodule init && git submodule update'\033[0m"
-        exit
-    fi
-
-    if [ -z "$NDK" -a "$NDK" == "" ]; then
-        echo -e "\033[31mFailed! NDK is empty. Run 'export NDK=[PATH_TO_NDK]'\033[0m"
-        exit
-    fi
-    
-    if [ -z "$NINJA_PATH" -a "$NINJA_PATH" == "" ]; then
-        echo -e "\033[31mFailed! NINJA_PATH is empty. Run 'export NINJA_PATH=[PATH_TO_NINJA]'\033[0m"
-        exit
-    fi
-}
-
-checkPreRequisites
-
-cd boringssl
-
-mkdir build
-cd build
 
 API=16
 
