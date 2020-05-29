@@ -8,8 +8,7 @@ ABIS="armeabi-v7a arm64-v8a x86 x86_64"
 
 NDK="$ANDROID_HOME/ndk-bundle"
 export ANDROID_NDK=$NDK
-
-ls -R $NDK
+export NINJA_PATH=/usr/bin/ninja
 
 function build_one {
 
