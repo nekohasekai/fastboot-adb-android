@@ -6,27 +6,62 @@ BUILD_DIR=$ROOT_DIR/build
 
 ABIS="armeabi-v7a arm64-v8a x86 x86_64"
 
-# NOTES: won't build on later version
+export NDK="$ANDROID_NDK"
 
-build() {
-  arch=$1
-  rm -rf $BUILD_DIR
-  mkdir $BUILD_DIR
-  cd $BUILD_DIR
-  cmake -DANDROID_ABI=$arch \
-      -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/third_party/android-cmake/android.toolchain.cmake \
-      -DANDROID_NATIVE_API_LEVEL=23 \
-      -GNinja $ROOT_DIR
-  ninja
-  if [ ! -d $DIST_DIR/$arch ]; then
-    mkdir -p $DIST_DIR/$arch
-  fi
-  mv $BUILD_DIR/crypto/libcrypto.a $DIST_DIR/$arch
-  mv $BUILD_DIR/decrepit/libdecrepit.a $DIST_DIR/$arch
+function build_one {
+	mkdir -p $BUILD_DIR/$CPU
+	cd $BUILD_DIR/$CPU
+
+	echo "Configuring..."
+	cmake -DANDROID_NATIVE_API_LEVEL=${API} -DANDROID_ABI=${CPU} -DCMAKE_BUILD_TYPE=Release -DANDROID_NDK=${NDK} -DCMAKE_TOOLCHAIN_FILE=$NDK/build/cmake/android.toolchain.cmake -DANDROID_NATIVE_API_LEVEL=16 -GNinja -DCMAKE_MAKE_PROGRAM=${NINJA_PATH} $ROOT_DIR	
+	echo "Building..."
+	cmake --build .
+  
+  mkdir -p $DIST_DIR/$CPU
+	
+  mv crypto/libcrypto.a $DIST_DIR/$CPU
+  mv decrepit/libdecrepit.a $DIST_DIR/$CPU
+  
+	cd ..
 }
 
-cd $ROOT_DIR
-for arch in $ABIS
-do
-  build $arch
-done
+function checkPreRequisites {
+
+    if ! [ -d "boringssl" ] || ! [ "$(ls -A boringssl)" ]; then
+        echo -e "\033[31mFailed! Submodule 'boringssl' not found!\033[0m"
+        echo -e "\033[31mTry to run: 'git submodule init && git submodule update'\033[0m"
+        exit
+    fi
+
+    if [ -z "$NDK" -a "$NDK" == "" ]; then
+        echo -e "\033[31mFailed! NDK is empty. Run 'export NDK=[PATH_TO_NDK]'\033[0m"
+        exit
+    fi
+    
+    if [ -z "$NINJA_PATH" -a "$NINJA_PATH" == "" ]; then
+        echo -e "\033[31mFailed! NINJA_PATH is empty. Run 'export NINJA_PATH=[PATH_TO_NINJA]'\033[0m"
+        exit
+    fi
+}
+
+checkPreRequisites
+
+cd boringssl
+
+mkdir build
+cd build
+
+API=16
+
+CPU=armeabi-v7a
+build_one
+
+CPU=x86
+build_one
+
+API=21
+CPU=arm64-v8a
+build_one
+
+CPU=x86_64
+build_one
