@@ -7,7 +7,6 @@ BUILD_DIR=$ROOT_DIR/build
 ABIS="armeabi-v7a arm64-v8a x86 x86_64"
 
 # NOTES: won't build on later version
-export ANDROID_NDK=/home/source/android-ndk-r15c
 
 build() {
   arch=$1
