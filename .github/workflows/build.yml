@@ -1,0 +1,17 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: |
+        bash 01_getsource.sh
+        bash 02_build_libcrypto.sh
+        bash 03_build_fastboot.sh
+        bash 04_build_adb.sh
+        ls -R
