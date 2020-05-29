@@ -11,7 +11,8 @@ LOCAL_CFLAGS += -Wno-unused-parameter
 LOCAL_CFLAGS := \
     -std=c++14 \
     -DANDROID_HOST_BUILD -DADB_HOST \
-    -Wall -Wextra -Werror -Wunreachable-code \
+    -Wall -Wextra -Werror \
+    -Wno-unused-parameter \
     -DFASTBOOT_VERSION='"shakalaca-$(shell date +%Y-%m-%d)-$(fastboot_version)"'
 
 LOCAL_C_INCLUDES := \
